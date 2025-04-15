@@ -1,30 +1,10 @@
 import React from "react";
-import ProductList from "./ProductList"; // Adjust the path if it's in a different folder
+import ProductList from "./components/ProductList"; // Adjust the path if it's in a different folder
+import { Link } from "react-router-dom";
 
 const MainPage = () => {
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Navbar */}
-      <header className="bg-white shadow-md">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-red-500">🍔 FastBite</h1>
-          <nav className="space-x-6 text-gray-700 font-medium">
-            <a href="#" className="hover:text-red-500">
-              Home
-            </a>
-            <a href="#" className="hover:text-red-500">
-              Menu
-            </a>
-            <a href="#" className="hover:text-red-500">
-              Orders
-            </a>
-            <a href="#" className="hover:text-red-500">
-              Contact
-            </a>
-          </nav>
-        </div>
-      </header>
-
       {/* Hero Section */}
       <section className="bg-yellow-100 py-12">
         <div className="container mx-auto px-4 text-center">
@@ -44,13 +24,6 @@ const MainPage = () => {
       <main className="container mx-auto px-4 py-10">
         <ProductList />
       </main>
-
-      {/* Footer */}
-      <footer className="bg-white border-t mt-10">
-        <div className="container mx-auto px-4 py-6 text-center text-gray-600 text-sm">
-          © {new Date().getFullYear()} FastBite. All rights reserved.
-        </div>
-      </footer>
     </div>
   );
 };
