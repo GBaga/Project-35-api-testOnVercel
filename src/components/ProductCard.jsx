@@ -1,69 +1,24 @@
-// components/ProductCard.jsx
-import React, { useState } from "react";
+import { useContext } from "react";
+import { CartContext } from "../context/CartContext";
 
-const ProductCard = ({ product, handleAddToCart, handleQuantityChange }) => {
-  const [quantity, setQuantity] = useState(product.quantityInCart || 0);
-
-  const onQuantityChange = (change) => {
-    const newQuantity = Math.max(0, quantity + change);
-    setQuantity(newQuantity);
-    handleQuantityChange(product._id, newQuantity);
-  };
+export default function ProductCard({ product }) {
+  const { addToCart } = useContext(CartContext);
 
   return (
-    <div className="bg-white shadow-lg rounded-2xl p-6 border flex flex-col">
-      {product.imageUrl && (
-        <img
-          src={product.imageUrl}
-          alt={product.name}
-          className="rounded-xl mb-4 h-48 w-full object-cover"
-        />
-      )}
-      <h2 className="text-xl font-bold">{product.name}</h2>
-      <p className="text-gray-700 mb-1">Price: {product.price}₾</p>
-      <p className="text-gray-700 mb-1">Quantity: {product.quantity}</p>
-      {product.description && (
-        <p className="text-sm text-gray-600 mb-1">{product.description}</p>
-      )}
-      {product.category && (
-        <p className="text-sm text-gray-500 mb-1">
-          Category: {product.category}
-        </p>
-      )}
-      <p
-        className={`text-sm font-medium ${
-          product.isAvailable ? "text-green-600" : "text-red-600"
-        }`}
-      >
-        {product.isAvailable ? "Available" : "Out of stock"}
-      </p>
-
-      {/* Quantity Controls */}
-      <div className="flex items-center mt-4">
-        <button
-          className="cursor-pointer px-4 py-2 text-white bg-blue-500 rounded"
-          onClick={() => onQuantityChange(-1)}
-        >
-          -
-        </button>
-        <span className="mx-4 text-lg">{quantity}</span>
-        <button
-          className="cursor-pointer px-4 py-2 text-white bg-blue-500 rounded"
-          onClick={() => onQuantityChange(1)}
-        >
-          +
-        </button>
-      </div>
-
-      {/* Add to Cart button */}
+    <div className="rounded-lg shadow-md p-4 bg-white">
+      <img
+        src={product.imageUrl}
+        alt={product.name}
+        className="w-full h-40 object-cover rounded"
+      />
+      <h3 className="font-semibold text-lg mt-2">{product.name}</h3>
+      <p className="text-red-600 font-bold">${product.price.toFixed(2)}</p>
       <button
-        className="mt-4 py-2 px-4 bg-green-500 text-white rounded"
-        onClick={() => handleAddToCart(product, quantity)}
+        onClick={() => addToCart(product._id, 1)}
+        className="mt-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
       >
         Add to Cart
       </button>
     </div>
   );
-};
-
-export default ProductCard;
+}

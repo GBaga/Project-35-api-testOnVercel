@@ -1,12 +1,5 @@
-import React from "react";
-import MainPage from "./MainPage";
-
-function App() {
-  return (
-    <div className="min-h-screen bg-gray-100">
-      <MainPage />
-    </div>
-  );
+// App.jsx
+import AppRoutes from "./router";
+export default function App() {
+  return <AppRoutes />;
 }
-
-export default App;
