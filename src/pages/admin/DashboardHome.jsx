@@ -1,44 +1,31 @@
-import AdminOrderCard from "../../components/AdminOrderCard";
-import AdminSidebar from "../../components/AdminSidebar";
-import OrdersPage from "../OrdersPage";
-import AddProductPage from "./AddProductPage";
-import EditProductPage from "./EditProductPage";
-import OrderDetailPage from "./OrderDetailPage";
-import ProductsPage from "./ProductsPage";
-import ManageProducts from "./ManageProducts";
-
-// DashboardHome.jsx
+import { Link } from "react-router-dom";
 
 export default function DashboardHome() {
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Admin Dashboard</h2>
-      <p>
-        Welcome to the admin panel. Use the sidebar to manage products and
-        orders.
+    <div className="p-6 min-h-screen bg-gray-50">
+      <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
+      <p className="text-gray-700 mb-8">
+        Welcome to the admin panel. Use the navigation links below to manage
+        products and orders.
       </p>
 
-      <p>AdminSidebar</p>
-      <AdminSidebar />
-      <p>AdminOrderCard x</p>
-      {/* <AdminOrderCard /> */}
-
-      <p>OrdersPage</p>
-
-      <p>manageProducts</p>
-      <ManageProducts />
-      <p>OrdersPage</p>
-      <OrdersPage />
-
-      <OrdersPage />
-      <p>AddProductPage</p>
-      <AddProductPage />
-      <p>EditProductPage</p>
-      <EditProductPage />
-      <p>OrdersDetails</p>
-      <OrderDetailPage />
-      <p>ProducstPage</p>
-      <ProductsPage />
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h2 className="text-xl font-semibold mb-4">Manage:</h2>
+        <nav className="flex flex-col gap-4">
+          <Link
+            to="/admin/products"
+            className="text-red-600 hover:underline text-lg"
+          >
+            ➔ Manage Products
+          </Link>
+          <Link
+            to="/admin/orders"
+            className="text-red-600 hover:underline text-lg"
+          >
+            ➔ Manage Orders
+          </Link>
+        </nav>
+      </div>
     </div>
   );
 }
