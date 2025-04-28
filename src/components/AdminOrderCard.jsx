@@ -1,4 +1,4 @@
-import OrderStatusBadge from "../order/OrderStatusBadge";
+import OrderStatusBadge from "./OrderStatusBadge";
 
 export default function AdminOrderCard({
   order,

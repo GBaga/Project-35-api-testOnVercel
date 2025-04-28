@@ -12,10 +12,18 @@ export const getUserOrders = (token) =>
     headers: { Authorization: `Bearer ${token}` },
   });
 
-export const getOrder = (id, token) =>
-  axios.get(`${API}/api/orders/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+export const getOrder = async (orderId) => {
+  if (!orderId) {
+    throw new Error("Order ID is required");
+  }
+  try {
+    const response = await axios.get(`${API_BASE_URL}/api/orders/${orderId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching order:", error);
+    throw error;
+  }
+};
 
 export const cancelOrder = (id, token) =>
   axios.patch(

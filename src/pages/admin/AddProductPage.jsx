@@ -1,4 +1,3 @@
-// AddProductPage.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createProduct } from "../../services/product";
@@ -9,15 +8,22 @@ export default function AddProductPage() {
   const [formData, setFormData] = useState({
     name: "",
     price: "",
+    quantity: 0,
     imageUrl: "",
     category: "burger",
     description: "",
+    isAvailable: true,
   });
+
   const { token } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
   const handleSubmit = async (e) => {

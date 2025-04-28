@@ -1,79 +1,85 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import axios from "axios";
+import { createContext, useState, useEffect, useContext } from "react";
+import {
+  getCart,
+  addToCart,
+  updateCartItem,
+  removeCartItem,
+  clearCart as clearCartAPI,
+} from "../services/cart";
 import { AuthContext } from "./AuthContext";
 
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const { token } = useContext(AuthContext);
-  const [cart, setCart] = useState(null);
+  const [cart, setCart] = useState({ items: [], totalAmount: 0 });
+  const [loading, setLoading] = useState(true);
 
-  const fetchCart = async () => {
+  const loadCart = async () => {
+    const savedToken = localStorage.getItem("authToken");
+    if (!savedToken) {
+      setCart({ items: [], totalAmount: 0 });
+      setLoading(false);
+      return; // ✅ Just exit early, no API call
+    }
+
     try {
-      const res = await axios.get("/api/cart", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setCart(res.data);
-    } catch (err) {
-      console.error("Fetch cart failed", err);
+      setLoading(true);
+      const res = await getCart();
+      if (res?.data) {
+        setCart(res.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch cart:", error);
+      setCart({ items: [], totalAmount: 0 });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const addToCart = async (productId, quantity) => {
+  const addItem = async (productId, quantity = 1) => {
     try {
-      const res = await axios.post(
-        "/api/cart",
-        { productId, quantity },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setCart(res.data);
-    } catch (err) {
-      console.error("Add to cart failed", err);
+      await addToCart(productId, quantity); // ✅ no token passed
+      await loadCart();
+    } catch (error) {
+      console.error("Failed to add item:", error);
     }
   };
 
-  const updateCartItem = async (productId, quantity) => {
+  const updateItem = async (productId, quantity) => {
     try {
-      const res = await axios.put(
-        "/api/cart",
-        { productId, quantity },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setCart(res.data);
-    } catch (err) {
-      console.error("Update item failed", err);
+      await updateCartItem(productId, quantity); // ✅ no token passed
+      await loadCart();
+    } catch (error) {
+      console.error("Failed to update cart item:", error);
     }
   };
 
-  const removeCartItem = async (productId) => {
+  const removeItem = async (productId) => {
     try {
-      const res = await axios.delete(`/api/cart/item/${productId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setCart(res.data);
-    } catch (err) {
-      console.error("Remove item failed", err);
+      await removeCartItem(productId); // ✅ no token passed
+      await loadCart();
+    } catch (error) {
+      console.error("Failed to remove cart item:", error);
     }
   };
 
   const clearCart = async () => {
     try {
-      const res = await axios.delete("/api/cart", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setCart(res.data.cart);
-    } catch (err) {
-      console.error("Clear cart failed", err);
+      await clearCartAPI(); // ✅ no token passed
+      setCart({ items: [], totalAmount: 0 });
+    } catch (error) {
+      console.error("Failed to clear cart:", error);
     }
   };
 
   useEffect(() => {
-    if (token) fetchCart();
+    loadCart();
   }, [token]);
 
   return (
     <CartContext.Provider
-      value={{ cart, addToCart, updateCartItem, removeCartItem, clearCart }}
+      value={{ cart, loading, addItem, updateItem, removeItem, clearCart }}
     >
       {children}
     </CartContext.Provider>

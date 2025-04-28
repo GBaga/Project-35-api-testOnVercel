@@ -1,32 +1,106 @@
+// src/services/cart.js
+
 import axios from "axios";
 
 const API = import.meta.env.VITE_API_BASE_URL;
 
-export const getCart = (token) =>
-  axios.get(`${API}/api/cart`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+// Utility function to get the token
+const getAuthToken = () => localStorage.getItem("authToken");
 
-export const addItemToCart = (productId, quantity, token) =>
-  axios.post(
-    `${API}/api/cart`,
-    { productId, quantity },
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
+// Check if the token exists
+const checkTokenValidity = (token) => {
+  if (!token) {
+    console.error("No authentication token available");
+    return false;
+  }
+  return true;
+};
 
-export const updateCartItem = (productId, quantity, token) =>
-  axios.put(
-    `${API}/api/cart`,
-    { productId, quantity },
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
+// Get user's cart
+export const getCart = () => {
+  const token = getAuthToken();
+  if (!checkTokenValidity(token)) return;
 
-export const removeCartItem = (productId, token) =>
-  axios.delete(`${API}/api/cart/item/${productId}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  return axios
+    .get(`${API}/api/cart`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    .catch((err) => {
+      console.error("Error fetching cart:", err.response?.data || err.message);
+      throw err;
+    });
+};
 
-export const clearCart = (token) =>
-  axios.delete(`${API}/api/cart`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+// Add item to cart
+export const addToCart = (productId, quantity) => {
+  const token = getAuthToken();
+  if (!checkTokenValidity(token)) return;
+
+  return axios
+    .post(
+      `${API}/api/cart`,
+      { productId, quantity },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    )
+    .catch((err) => {
+      console.error("Error adding to cart:", err.response?.data || err.message);
+      throw err;
+    });
+};
+
+// Update cart item quantity
+export const updateCartItem = (productId, quantity) => {
+  const token = getAuthToken();
+  if (!checkTokenValidity(token)) return;
+
+  return axios
+    .put(
+      `${API}/api/cart`,
+      { productId, quantity },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    )
+    .catch((err) => {
+      console.error(
+        "Error updating cart item:",
+        err.response?.data || err.message
+      );
+      throw err;
+    });
+};
+
+// Remove item from cart
+export const removeCartItem = (productId) => {
+  const token = getAuthToken();
+  if (!checkTokenValidity(token)) return;
+
+  return axios
+    .delete(`${API}/api/cart/item/${productId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    .catch((err) => {
+      console.error(
+        "Error removing item from cart:",
+        err.response?.data || err.message
+      );
+      throw err;
+    });
+};
+
+// Clear cart
+export const clearCart = () => {
+  const token = getAuthToken();
+  if (!checkTokenValidity(token)) return;
+
+  return axios
+    .delete(`${API}/api/cart`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    .catch((err) => {
+      console.error("Error clearing cart:", err.response?.data || err.message);
+      throw err;
+    });
+};

@@ -1,3 +1,4 @@
+// src/context/AuthContext.js
 import { createContext, useState, useEffect } from "react";
 import axios from "axios";
 
@@ -10,42 +11,59 @@ if (!API) {
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const storedToken = localStorage.getItem("token");
-  const [token, setToken] = useState(storedToken ? storedToken : null);
+  const [token, setToken] = useState(localStorage.getItem("token") || null);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
     if (token) {
-      axios
-        .get(`${API}/api/auth/me`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        .then((res) => setUser(res.data))
-        .catch((error) => {
-          if (error.response && error.response.status === 401) {
-            console.error("Token expired or invalid");
-            logout();
-          } else {
-            console.error("Error fetching user data:", error);
-            logout();
-          }
-        });
+      localStorage.setItem("authToken", token); // ✅ correct key
+      fetchUserProfile(token);
     } else {
+      localStorage.removeItem("authToken"); // ✅
       setUser(null);
     }
   }, [token]);
 
-  const login = (token, userData) => {
-    localStorage.setItem("token", token);
-    setToken(token);
-    setUser(userData);
+  const fetchUserProfile = async (token) => {
+    try {
+      const res = await axios.get(`${API}/api/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUser(res.data);
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+
+      if (error.response?.status === 401) {
+        logout();
+        alert("Session expired. Please log in again.");
+      }
+    }
+  };
+
+  const login = async (email, password) => {
+    try {
+      const res = await axios.post(`${API}/api/auth/login`, {
+        email,
+        password,
+      });
+      const { token } = res.data;
+
+      // ✅ Save token immediately
+      localStorage.setItem("authToken", token);
+
+      setToken(token);
+      console.log("Login successful");
+    } catch (error) {
+      console.error("Login failed:", error.response?.data || error.message);
+      throw error;
+    }
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
     setToken(null);
     setUser(null);
-    console.info("User logged out");
+    localStorage.removeItem("authToken"); // ✅
+    console.info("Logged out");
   };
 
   return (

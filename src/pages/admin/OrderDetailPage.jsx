@@ -1,43 +1,48 @@
-// OrderDetailPage.jsx
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { getOrder } from "../../services/order";
-import useAuth from "../../hooks/useAuth";
+import { getOrder } from "../../services/order"; // adjust path if needed
 
 export default function OrderDetailPage() {
-  const { id } = useParams();
-  const { token } = useAuth();
+  const { orderId } = useParams();
   const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    getOrder(id, token).then((res) => setOrder(res.data));
-  }, [id]);
+    if (orderId) {
+      getOrder(orderId)
+        .then((res) => {
+          setOrder(res.data);
+          setError(null);
+        })
+        .catch(() => setError("Failed to fetch order"))
+        .finally(() => setLoading(false));
+    } else {
+      setError("Order ID is missing");
+      setLoading(false);
+    }
+  }, [orderId]);
 
-  if (!order) return <p className="p-4">Loading order details...</p>;
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
 
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Order Detail</h2>
-      <p>
-        <strong>Order ID:</strong> {order._id}
-      </p>
-      <p>
-        <strong>Status:</strong> {order.status}
-      </p>
-      <p>
-        <strong>Payment:</strong> {order.paymentStatus}
-      </p>
-      <p>
-        <strong>Total:</strong> ${order.totalAmount}
-      </p>
-      <h3 className="mt-4 font-semibold">Items</h3>
-      <ul className="list-disc ml-6">
-        {order.items.map((item, index) => (
-          <li key={index}>
-            {item.name} x {item.quantity} (${item.price})
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-4">Order #{order._id}</h2>
+      <p>Status: {order.status}</p>
+      <p>Date: {new Date(order.createdAt).toLocaleString()}</p>
+
+      <h3 className="text-xl mt-6 mb-2">Items</h3>
+      <ul className="space-y-2">
+        {order.items.map((item) => (
+          <li key={item._id}>
+            {item.name} × {item.quantity} — $
+            {(item.price * item.quantity).toFixed(2)}
           </li>
         ))}
       </ul>
+
+      <h3 className="text-xl mt-6">Total: ${order.totalAmount.toFixed(2)}</h3>
     </div>
   );
 }

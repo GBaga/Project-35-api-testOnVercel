@@ -1,8 +1,10 @@
 // LoginPage.jsx
 import { useState } from "react";
-import { login as loginApi } from "../services/auth";
+import { login as loginApi, getMe } from "../services/auth"; // ✅ getMe imported here
 import useAuth from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import DashboardHome from "./admin/DashboardHome";
+import ManageOrders from "./admin/ManageOrders";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -13,10 +15,10 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await loginApi({ email, password });
-      login(res.data.token, res.data.user);
-      navigate("/");
+      await login(email, password); // ✅ Use useAuth login directly
+      navigate("/"); // ✅ Redirect after login
     } catch (err) {
+      console.error("Login failed:", err);
       alert("Login failed");
     }
   };
