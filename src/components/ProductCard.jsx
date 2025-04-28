@@ -8,6 +8,8 @@ export default function ProductCard({ product }) {
     addToCart(product._id, 1);
   };
 
+  const isAvailable = product.isAvailable;
+
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
       <div className="h-56 bg-gray-200">
@@ -29,9 +31,14 @@ export default function ProductCard({ product }) {
         </p>
         <button
           onClick={handleAddToCart}
-          className="w-full bg-red-600 text-white py-2 rounded font-medium hover:bg-red-700 transition cursor-pointer"
+          disabled={!isAvailable}
+          className={`w-full py-2 rounded font-medium transition cursor-pointer ${
+            isAvailable
+              ? "bg-red-600 text-white hover:bg-red-700"
+              : "bg-gray-400 text-white cursor-not-allowed"
+          }`}
         >
-          Add to Cart
+          {isAvailable ? "Add to Cart" : "Not Available"}
         </button>
       </div>
     </div>
