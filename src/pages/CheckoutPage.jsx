@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useCart from "../hooks/useCart";
 import useAuth from "../hooks/useAuth";
 import { createOrder } from "../services/order";
 import { useNavigate } from "react-router-dom";
+import { getCart } from "../services/cart";
 
 export default function CheckoutPage() {
-  const { cart, clearCart } = useCart();
+  const { cart, clearCart, setCart } = useCart();
   const { token } = useAuth();
   const navigate = useNavigate();
 
@@ -13,15 +14,40 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [note, setNote] = useState("");
 
+  const refreshCart = async () => {
+    try {
+      const res = await getCart();
+      setCart(res.data);
+    } catch (error) {
+      console.error("Error refreshing cart:", error);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const orderData = { pickupTime, paymentMethod, note };
+      await refreshCart(); // Refresh latest cart
+
+      if (!cart || cart.items.length === 0) {
+        alert("Cart is empty! Cannot place order.");
+        return;
+      }
+
+      const orderData = {
+        pickupTime,
+        paymentMethod,
+        note,
+      };
+
+      console.log("🛒 Submitting Order Data:", orderData);
+
       await createOrder(orderData, token);
       clearCart();
       navigate("/orders");
     } catch (err) {
-      console.error(err);
+      console.error("Order error:", err);
+      alert("Failed to place order.");
     }
   };
 

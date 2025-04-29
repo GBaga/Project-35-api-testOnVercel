@@ -1,5 +1,6 @@
 // src/components/AdminOrderCard.jsx
 import React from "react";
+import OrderStatusBadge from "./OrderStatusBadge";
 
 export default function AdminOrderCard({
   order,
@@ -17,52 +18,91 @@ export default function AdminOrderCard({
   };
 
   return (
-    <div className="border p-4 rounded shadow-md flex flex-col gap-2">
-      <div className="flex justify-between items-center">
+    <div className="border p-4 rounded shadow-md flex flex-col gap-4">
+      {/* Top Info */}
+      <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
         <div>
-          <p className="font-bold">Order ID: {order._id}</p>
-          <p className="text-sm text-gray-600">
-            User: {order.user?.name || "Guest"}
+          <p className="font-bold text-lg">Order ID: {order._id}</p>
+          <p className="text-gray-700 text-sm font-semibold">
+            Customer: {order.user?.name || "Guest"}
           </p>
-          <p className="text-sm text-gray-600">
+          {order.user?.email && (
+            <p className="text-gray-600 text-sm">Email: {order.user.email}</p>
+          )}
+          {order.user?.mobile && (
+            <p className="text-gray-600 text-sm">Mobile: {order.user.mobile}</p>
+          )}
+          {order.user?.secondMobile && (
+            <p className="text-gray-600 text-sm">
+              Second Mobile: {order.user.secondMobile}
+            </p>
+          )}
+          <p className="text-gray-600 text-sm mt-1">
             Total: ${order.totalAmount?.toFixed(2)}
           </p>
         </div>
 
-        {/* Status */}
+        {/* Dropdowns */}
         <div className="flex flex-col gap-2">
-          <select
-            value={order.status}
-            onChange={handleStatusChange}
-            className="border px-3 py-1 rounded"
-          >
-            <option value="pending">Pending</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="delivered">Delivered</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
+          {/* Current Status Badge */}
+          <div>
+            <OrderStatusBadge status={order.status} />
+          </div>
+
+          {/* Change Order Status */}
+          <div>
+            <label className="text-sm text-gray-700">
+              Change Order Status:
+            </label>
+            <select
+              value={order.status}
+              onChange={handleStatusChange}
+              className="border px-3 py-1 rounded mt-1 w-48"
+            >
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="preparing">Preparing</option>
+              <option value="ready">Ready</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
 
           {/* Payment Status */}
-          <select
-            value={order.paymentStatus}
-            onChange={handlePaymentChange}
-            className="border px-3 py-1 rounded"
-          >
-            <option value="pending">Payment Pending</option>
-            <option value="paid">Paid</option>
-          </select>
+          <div>
+            <label className="text-sm text-gray-700">Payment Status:</label>
+            <select
+              value={order.paymentStatus}
+              onChange={handlePaymentChange}
+              className="border px-3 py-1 rounded mt-1 w-48"
+            >
+              <option value="pending">Pending</option>
+              <option value="paid">Paid</option>
+              <option value="failed">Failed</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      {/* Optional: List items */}
+      {/* Order Items */}
       <div className="mt-2">
         <p className="font-semibold">Items:</p>
-        {order.items?.map((item) => (
-          <p key={item._id} className="text-sm">
-            {item.product?.name || "Product"} × {item.quantity}
-          </p>
-        ))}
+        <ul className="list-disc pl-5 text-sm text-gray-700">
+          {order.items?.map((item) => (
+            <li key={item._id}>
+              {item.name} × {item.quantity}
+            </li>
+          ))}
+        </ul>
       </div>
+
+      {/* Optional Note */}
+      {order.note && (
+        <div className="mt-2">
+          <p className="font-semibold">Note:</p>
+          <p className="text-gray-600 text-sm">{order.note}</p>
+        </div>
+      )}
     </div>
   );
 }
